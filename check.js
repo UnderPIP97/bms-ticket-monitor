@@ -1,38 +1,19 @@
 const fs = require("fs");
 
-const URL = "https://in.bookmyshow.com/sports/icc-men-s-t20-world-cup-2026-semi-final-2/ET00474271";
-
 const SERVICE_ID = "service_xet3t67";
 const TEMPLATE_ID = "template_vphie6n";
 const PUBLIC_KEY = "8USmaaWYFTn285YIh";
 
 async function checkTickets() {
   try {
-    // Stop if already alerted
-    if (fs.existsSync("sent.flag")) {
-      console.log("Already sent alert");
-      return;
-    }
+    console.log("TEST MODE — forcing email send");
 
-    const res = await fetch(URL, { cache: "no-store" });
-    const html = await res.text();
+    await sendEmail();
 
-    const isComingSoon = html.includes("Coming Soon");
+    // create flag so workflow step still works
+    fs.writeFileSync("sent.flag", "test");
 
-    const hasTicketUI =
-      html.includes("event-action-button") ||
-      html.includes("book-button") ||
-      html.includes("price-chip") ||
-      html.includes("ticket-price") ||
-      html.includes("cta-book");
-
-    if (!isComingSoon && hasTicketUI) {
-      await sendEmail();
-      fs.writeFileSync("sent.flag", "sent");
-      console.log("LIVE detected — email sent");
-    } else {
-      console.log("Not live yet");
-    }
+    console.log("TEST email sent");
   } catch (e) {
     console.log("Error:", e);
   }
@@ -51,7 +32,7 @@ async function sendEmail() {
       template_params: {
         to_email: "jaywagh01@gmail.com",
         ts: ts,
-        source: "github-monitor"
+        source: "github-test"
       }
     })
   });

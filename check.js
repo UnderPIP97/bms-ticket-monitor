@@ -18,14 +18,8 @@ async function checkTickets() {
     const html = await res.text();
 
     // --- Robust detection ---
-    const isComingSoon = html.includes("Coming Soon");
-
-    const hasTicketUI =
-      html.includes("event-action-button") ||
-      html.includes("book-button") ||
-      html.includes("price-chip") ||
-      html.includes("ticket-price") ||
-      html.includes("cta-book");
+    const isComingSoon = false;
+    const hasTicketUI = true;
 
     if (!isComingSoon && hasTicketUI) {
       await sendEmail();

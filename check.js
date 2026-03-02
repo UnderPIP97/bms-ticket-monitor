@@ -8,6 +8,7 @@ const PUBLIC_KEY = "8USmaaWYFTn285YIh";
 
 async function checkTickets() {
   try {
+    // Stop if already alerted
     if (fs.existsSync("sent.flag")) {
       console.log("Already sent alert");
       return;
@@ -16,13 +17,17 @@ async function checkTickets() {
     const res = await fetch(URL, { cache: "no-store" });
     const html = await res.text();
 
+    // --- Robust detection ---
     const isComingSoon = html.includes("Coming Soon");
-    const isLive =
-      html.includes("Book") ||
-      html.includes("Buy") ||
-      html.includes("₹");
 
-    if (!isComingSoon && isLive) {
+    const hasTicketUI =
+      html.includes("event-action-button") ||
+      html.includes("book-button") ||
+      html.includes("price-chip") ||
+      html.includes("ticket-price") ||
+      html.includes("cta-book");
+
+    if (!isComingSoon && hasTicketUI) {
       await sendEmail();
       fs.writeFileSync("sent.flag", "sent");
       console.log("LIVE detected — email sent");

@@ -9,17 +9,22 @@ const PUBLIC_KEY = "8USmaaWYFTn285YIh";
 async function checkTickets() {
   try {
     // Stop if already alerted
-    // if (fs.existsSync("sent.flag")) {
-    //   console.log("Already sent alert");
-    //   return;
-    // }
+    if (fs.existsSync("sent.flag")) {
+      console.log("Already sent alert");
+      return;
+    }
 
     const res = await fetch(URL, { cache: "no-store" });
     const html = await res.text();
 
-    // --- Robust detection ---
-    const isComingSoon = false;
-    const hasTicketUI = true;
+    const isComingSoon = html.includes("Coming Soon");
+
+    const hasTicketUI =
+      html.includes("event-action-button") ||
+      html.includes("book-button") ||
+      html.includes("price-chip") ||
+      html.includes("ticket-price") ||
+      html.includes("cta-book");
 
     if (!isComingSoon && hasTicketUI) {
       await sendEmail();
@@ -34,13 +39,20 @@ async function checkTickets() {
 }
 
 async function sendEmail() {
+  const ts = new Date().toISOString();
+
   await fetch("https://api.emailjs.com/api/v1.0/email/send", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       service_id: SERVICE_ID,
       template_id: TEMPLATE_ID,
-      user_id: PUBLIC_KEY
+      user_id: PUBLIC_KEY,
+      template_params: {
+        to_email: "jaywagh01@gmail.com",
+        ts: ts,
+        source: "github-monitor"
+      }
     })
   });
 }

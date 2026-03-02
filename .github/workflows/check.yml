@@ -1,0 +1,25 @@
+name: Check Tickets
+
+on:
+  schedule:
+    - cron: "*/1 * * * *"
+  workflow_dispatch:
+
+jobs:
+  run-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run monitor
+        run: node check.js
+
+      - name: Commit flag if exists
+        run: |
+          if [ -f sent.flag ]; then
+            git config user.name "bot"
+            git config user.email "bot@example.com"
+            git add sent.flag
+            git commit -m "alert sent"
+            git push
+          fi

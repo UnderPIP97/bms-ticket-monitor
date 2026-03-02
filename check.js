@@ -9,10 +9,10 @@ const PUBLIC_KEY = "8USmaaWYFTn285YIh";
 async function checkTickets() {
   try {
     // Stop if already alerted
-    if (fs.existsSync("sent.flag")) {
-      console.log("Already sent alert");
-      return;
-    }
+    // if (fs.existsSync("sent.flag")) {
+    //   console.log("Already sent alert");
+    //   return;
+    // }
 
     const res = await fetch(URL, { cache: "no-store" });
     const html = await res.text();
